@@ -1,5 +1,5 @@
 import { StationLocation, StationName } from './allLocations';
-import { LatLng, computeDistanceBetween, computeHeading } from 'spherical-geometry-js';
+import { LatLng, computeDistanceBetween, computeHeading } from 'spherical-geometry-js'; //i'd like to recommend turf.js instead
 import { metro } from './stations';
 
 
@@ -60,7 +60,8 @@ class Station {
       
   }
   
-  class Network {
+class Network {
+    routePreference: 'MINIMIZE_TRANSFERS' | 'MINIMIZE_DISTANCE';
     name: string;
     lines: Line[];
     adjacencyList: Map<Station, Set<Station>>;
@@ -184,7 +185,23 @@ class Station {
             `Take  ${direction?.name} direction, ${commonLinesArray[0].name}`,
             `Ride ${path.length} stations.`
           ]
-          return [path, instructions];
+          // return [path, instructions];
+          //instead of this returnign
+          const possiblePaths = //generated possible paths goes here
+
+          if (this.routePreference === 'MINIMIZE_TRANSFERS') {
+            possiblePaths.sort((a, b) => {
+              return a.transfers - b.transfers; 
+            });
+          }
+          else if (this.routePreference === 'MINIMIZE_DISTANCE') {
+            possiblePaths.sort((a, b) => {
+              return a.totalDistance - b.totalDistance;
+            });
+          }
+           // Return best path after sorting
+          return possiblePaths[0];
+          //+ we'd handle tiebreakers if two paths have equal transfers/distance, and allow control over sort order (ascending vs descending), also making a lil caching sorted paths to avoid re-sorting each time yk
         }
         
         const intersections = metro.getIntersections();
